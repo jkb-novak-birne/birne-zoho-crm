@@ -1,7 +1,9 @@
 from .initialize_sdk import initialize_zoho_sdk
 from .get_modules import getModules
 from .coql_query import coqlQuery
+from .search_records import searchRecords
 from .get_record import getRecordById
+from .get_records import getRecords
 class ZohoCRMWrapper:
     def __init__(self, client_id: str, client_secret: str, refresh_token: str, redirect_url: str, user_email:str,api_domain: str = "www.zohoapis.com"):
         """
@@ -31,3 +33,9 @@ class ZohoCRMWrapper:
 
     def getRecordById(self, module_api_name, record_id):
         return getRecordById(module_api_name,record_id)
+    
+    def searchRecords(self,module_api_name,searchCriteria):
+        return searchRecords(module_api_name,searchCriteria)
+    
+    def getRecords(self,module_api_name):
+        return getRecords(module_api_name)

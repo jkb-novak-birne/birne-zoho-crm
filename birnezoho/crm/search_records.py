@@ -1,21 +1,28 @@
 from zcrmsdk.src.com.zoho.crm.api import HeaderMap, ParameterMap
+from zcrmsdk.src.com.zoho.crm.api.attachments import Attachment
+from zcrmsdk.src.com.zoho.crm.api.layouts import Layout
 from zcrmsdk.src.com.zoho.crm.api.record import *
 from zcrmsdk.src.com.zoho.crm.api.record import Record as ZCRMRecord
+from zcrmsdk.src.com.zoho.crm.api.tags import Tag
+from zcrmsdk.src.com.zoho.crm.api.users import User
+from zcrmsdk.src.com.zoho.crm.api.util import Choice, StreamWrapper
+from datetime import datetime
 from .utils import handle_list_value,handle_value
 
-def getRecordById(module_api_name, record_id):
-
+def searchRecords(module_api_name, searchParams):
+    response_record_list = []
     # Get instance of RecordOperations Class
     record_operations = RecordOperations()
 
     # Get instance of ParameterMap Class
     param_instance = ParameterMap()
+    param_instance.add(SearchRecordsParam.criteria, searchParams)
 
     # Get instance of HeaderMap Class
     header_instance = HeaderMap()
 
     # Call get_record method
-    response = record_operations.get_record(record_id, module_api_name, param_instance, header_instance)
+    response = record_operations.search_records(module_api_name, param_instance, header_instance)
 
     if response is not None:
         if response.get_status_code() in [204, 304]:
@@ -62,8 +69,9 @@ def getRecordById(module_api_name, record_id):
                         record_dict[key_name] = handle_value(value)
 
                 record_data = record_dict
+                response_record_list.append(record_data)
 
-            return record_data
+            return response_record_list
 
         elif isinstance(response_object, APIException):
             return {
@@ -74,4 +82,3 @@ def getRecordById(module_api_name, record_id):
             }
 
     return None
-
