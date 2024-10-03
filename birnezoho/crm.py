@@ -22,6 +22,7 @@ class ZohoCRMWrapper:
         redirect_url (str): OAuth redirect URL.
         api_domain (str): Zoho CRM API domain.
         """
+        print("Initializing zoho crm")
         self.client_id = client_id
         self.client_secret = client_secret
         self.refresh_token = refresh_token
