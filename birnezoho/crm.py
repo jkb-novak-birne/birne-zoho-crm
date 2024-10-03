@@ -35,10 +35,17 @@ class ZohoCRMWrapper:
         Initialize the Zoho SDK with OAuth credentials and environment configuration.
         """
 
-        #currrent pahts:
+        # Define the zohoStore folder path
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        logger_path = os.path.join(current_dir, "zohoStore", "zcrm_logger.log")
-        token_store_path = os.path.join(current_dir, "zohoStore", "zcrm_tokens.txt")
+        zoho_store_path = os.path.join(current_dir, "zohoStore")
+
+        # Check if the folder exists; if not, create it
+        if not os.path.exists(zoho_store_path):
+            os.makedirs(zoho_store_path)
+
+        # Define paths for logger and token files
+        logger_path = os.path.join(zoho_store_path, "zcrm_logger.log")
+        token_store_path = os.path.join(zoho_store_path, "zcrm_tokens.txt")
 
         # User signature
         user = UserSignature(self.user_email)
