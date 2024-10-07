@@ -48,7 +48,7 @@ def initialize_zoho_sdk(self):
         config = SDKConfig(auto_refresh_fields=True, pick_list_validation=False)
         
         #resource path
-        resource_path = '.'
+        resource_path = zoho_store_path
 
         #Initialize SDK
         Initializer.initialize(user=user, environment=environment, token=token, store=store, sdk_config=config, resource_path = resource_path, logger=logger)

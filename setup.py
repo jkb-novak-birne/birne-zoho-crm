@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='birne-zoho-crm',
-    version='0.2.0',
+    version='0.2.1',
     description='A Python library for interacting with Zoho CRM',
     author='Jakub Novák',
     author_email='jakub.novak@birne.com',
