@@ -4,6 +4,7 @@ from .coql_query import coqlQuery
 from .search_records import searchRecords
 from .get_record import getRecordById
 from .get_records import getRecords
+from .update_record import updateRecord
 class ZohoCRMWrapper:
     def __init__(self, client_id: str, client_secret: str, refresh_token: str, redirect_url: str, user_email:str,api_domain: str = "www.zohoapis.com"):
         """
@@ -39,3 +40,6 @@ class ZohoCRMWrapper:
     
     def getRecords(self,module_api_name):
         return getRecords(module_api_name)
+    
+    def updateRecord(self,module_api_name,record_id:int,record_data:dict):
+        return updateRecord(module_api_name,record_id,record_data)

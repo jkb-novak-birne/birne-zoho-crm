@@ -3,13 +3,14 @@ from zcrmsdk.src.com.zoho.crm.api.record import *
 from zcrmsdk.src.com.zoho.crm.api.record import Record as ZCRMRecord
 from .utils import handle_list_value,handle_value
 
-def birne_record_operations(operation_name,module_api_name=None,record_id=None,search_params=None):
+def birne_record_operations(operation_name,module_api_name=None,record_id=None,search_params=None,record_data:ZCRMRecord=None,trigger:list[str]=[]):
     """
     Wrapper method for calling differrent sdk functions and then processing result
-    :operation_name: type of operation [GET_RECORD,SEARCH_RECORD,GET_RECORDS]
+    :param operation_name: type of operation [GET_RECORD,SEARCH_RECORD,GET_RECORDS,UPDATE_RECORD]
     :param module_api_name: The API Name of the module to fetch records from
-    :record_id: id of record for GET_RECORD operation
-    :search_params: search params for SEARCH_RECORD operation
+    :param record_id: id of record for GET_RECORD operation
+    :param search_params: search params for SEARCH_RECORD operation
+    :param trigger: Set the list containing the trigger operations to be run ["approval", "workflow", "blueprint"]
     """
     has_more_records = True
     page = 1
@@ -29,33 +30,67 @@ def birne_record_operations(operation_name,module_api_name=None,record_id=None,s
     while has_more_records:
         param_instance = ParameterMap()
         param_instance.add(GetRecordsParam.page, page)
-        print(f"Fetching {module_api_name} - page {page}")
+        
         response = None
         match operation_name:
             case "GET_RECORDS":
+                print(f"Fetching {module_api_name} - page {page}")
                 response = record_operations.get_records(module_api_name, param_instance, header_instance)
             case "GET_RECORD":
                 response = record_operations.get_record(record_id,module_api_name, param_instance, header_instance)
             case "SEARCH_RECORD":
+                print(f"Fetching {module_api_name} - page {page}")
                 param_instance.add(SearchRecordsParam.criteria, search_params)
                 response = record_operations.search_records(module_api_name, param_instance, header_instance)
-
+            case "UPDATE_RECORD":
+                request = BodyWrapper()
+                records_list = []
+                records_list.append(record_data)
+                request.set_data(records_list)
+                request.set_trigger(trigger)
+                response = record_operations.update_record(record_id, module_api_name, request, header_instance)
         if response is not None:
             if response.get_status_code() in [204, 304]:
                 return None  # No content or not modified
 
             response_object = response.get_object()
+            if isinstance(response_object, ActionWrapper):
+                returnObj = {}
+                action_response_list = response_object.get_data()
+                for action_response in action_response_list:
+                    # Check if the request is successful
+                    if isinstance(action_response, SuccessResponse):
+                        # Get the details dict
+                        details = action_response.get_details()
+                        for key, value in details.items():
+                            returnObj[key] = str(value)
+                        return returnObj
+                    # Check if the request returned an exception
+                    elif isinstance(action_response, APIException):
+                        # Get the Status
+                        print("Status: " + action_response.get_status().get_value())
 
-            info = response_object.get_info()
-            if info is not None:
-                if info.get_more_records() is not None:
-                    has_more_records = info.get_more_records()
+                        # Get the Code
+                        print("Code: " + action_response.get_code().get_value())
+
+                        print("Details")
+
+                        # Get the details dict
+                        details = action_response.get_details()
+
+                        for key, value in details.items():
+                            returnObj[key] = str(value)
+                            return returnObj
+    
+            if isinstance(response_object, ResponseWrapper):
+                info = response_object.get_info()
+                if info is not None:
+                    if info.get_more_records() is not None:
+                        has_more_records = info.get_more_records()
+                    else:
+                        has_more_records = False
                 else:
                     has_more_records = False
-            else:
-                has_more_records = False
-
-            if isinstance(response_object, ResponseWrapper):
                 record_list = response_object.get_data()
                 if not record_list:
                     return None
