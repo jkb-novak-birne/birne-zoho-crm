@@ -20,8 +20,10 @@ def handle_list_value(value):
         }
     elif isinstance(value, Choice):
         return value.get_value()
+    elif isinstance(value, list):
+        return [handle_list_value(v) for v in value]
     elif isinstance(value, ZCRMRecord):
-        return {key: val for key, val in value.get_key_values().items()}
+        return handle_value(value)
     elif isinstance(value, Tag):
         return {"name": value.get_name(), "id": value.get_id()}
     # Add more cases as needed for other list types
@@ -33,15 +35,25 @@ def handle_value(value):
     elif isinstance(value, Layout):
         return {"id": value.get_id(), "name": value.get_name()}
     elif isinstance(value, ZCRMRecord):
-        return {"id": value.get_id(), "name": value.get_key_value('name')}
+        print("HERE")
+        return handle_record_to_dict(value)
     elif isinstance(value, Choice):
         return value.get_value()
     elif isinstance(value, datetime):
         return str(value)
+    elif isinstance(value,list):
+        return [handle_list_value(v) for v in value]
     elif isinstance(value, dict):
         return {key: str(val) for key, val in value.items()}
     # Handle other value types as needed
     return str(value)
+
+def handle_record_to_dict(record):
+    print("RECORD")
+    result_dict = {}
+    for key,value in record.get_key_values().items():
+        result_dict[key] = handle_value(value)
+    return result_dict
 
 def handle_dict_to_record(module_api_name:str,record_data:dict=None)->ZCRMRecord:
     fields = get_module_fields(module_api_name)

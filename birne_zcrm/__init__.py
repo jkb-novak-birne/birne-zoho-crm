@@ -1,10 +1,10 @@
 from .initialize_sdk import initialize_zoho_sdk
 from .get_modules import getModules
 from .coql_query import coqlQuery
-from .search_records import searchRecords
-from .get_record import getRecordById
-from .get_records import getRecords
-from .update_record import updateRecord
+from .search_records import search_records_wrapper
+from .get_record import get_record_wrapper
+from .get_records import get_records_wrapper
+from .update_record import update_record_wrapper
 class ZohoCRMWrapper:
     def __init__(self, client_id: str, client_secret: str, refresh_token: str, redirect_url: str, user_email:str,api_domain: str = "www.zohoapis.com"):
         """
@@ -33,13 +33,13 @@ class ZohoCRMWrapper:
         return coqlQuery(query)
 
     def getRecordById(self, module_api_name, record_id):
-        return getRecordById(module_api_name,record_id)
+        return get_record_wrapper(module_api_name,record_id)
     
     def searchRecords(self,module_api_name,searchCriteria):
-        return searchRecords(module_api_name,searchCriteria)
+        return search_records_wrapper(module_api_name,searchCriteria)
     
     def getRecords(self,module_api_name):
-        return getRecords(module_api_name)
+        return get_records_wrapper(module_api_name)
     
-    def updateRecord(self,module_api_name,record_id:int,record_data:dict):
-        return updateRecord(module_api_name,record_id,record_data)
+    def updateRecord(self,module_api_name,record_id:int,record_data:dict,trigger = []):
+        return update_record_wrapper(module_api_name,record_id,record_data,trigger)
