@@ -57,6 +57,11 @@ class BirneRecordOperations:
                 request.set_data([record_data])
                 request.set_trigger(self.trigger)
                 return self.record_operations.update_record(record_id, self.module_api_name, request, self.header_instance)
+            case "CREATE_RECORD":
+                request = BodyWrapper()
+                request.set_data([record_data])
+                request.set_trigger(self.trigger)
+                return self.record_operations.create_records(self.module_api_name, request, self.header_instance)
         return None
 
     def _process_action_response(self, response_object):
