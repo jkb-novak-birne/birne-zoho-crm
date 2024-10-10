@@ -6,6 +6,8 @@ from .get_record import get_record_wrapper
 from .get_records import get_records_wrapper
 from .update_record import update_record_wrapper
 from .create_record import create_record_wrapper
+from .upsert_file_record_param import upsert_file_record_param
+from .patches import apply_zoho_patches
 class ZohoCRMWrapper:
     def __init__(self, client_id: str, client_secret: str, refresh_token: str, redirect_url: str, user_email:str,api_domain: str = "www.zohoapis.com"):
         """
@@ -25,6 +27,7 @@ class ZohoCRMWrapper:
         self.redirect_url = redirect_url
         self.api_domain = api_domain
         self.user_email = user_email
+        apply_zoho_patches()
         initialize_zoho_sdk(self)
     
     def getModules(self):
@@ -47,4 +50,7 @@ class ZohoCRMWrapper:
     
     def createRecord(self,module_api_name,record_data:dict,trigger = []):
         return create_record_wrapper(module_api_name,record_data,trigger)
+    
+    def upsertFileRecordParam(self,module_api_name, record_id, field_api_name, file_path,trigger=None):
+        return upsert_file_record_param(module_api_name, record_id, field_api_name, file_path,trigger=None)
     

@@ -1,5 +1,6 @@
 from zcrmsdk.src.com.zoho.crm.api.layouts import Layout
 from zcrmsdk.src.com.zoho.crm.api.record import *
+from zcrmsdk.src.com.zoho.crm.api.record import FileDetails as ZCRMFileDetails
 from zcrmsdk.src.com.zoho.crm.api.record import Record as ZCRMRecord
 from zcrmsdk.src.com.zoho.crm.api.tags import Tag
 from zcrmsdk.src.com.zoho.crm.api.users import User
@@ -10,10 +11,11 @@ from zcrmsdk.src.com.zoho.crm.api import HeaderMap, ParameterMap
 from datetime import datetime
 
 def handle_list_value(value):
-    if isinstance(value, FileDetails):
+    if isinstance(value, ZCRMFileDetails):
         return {
             "extn": value.get_extn(),
             "is_preview_available": value.get_is_preview_available(),
+            "attachment_id":str(value.get_attachment_id()),
             "download_url": value.get_download_url(),
             "file_name": value.get_file_name(),
             "file_size": value.get_file_size(),
@@ -35,7 +37,6 @@ def handle_value(value):
     elif isinstance(value, Layout):
         return {"id": value.get_id(), "name": value.get_name()}
     elif isinstance(value, ZCRMRecord):
-        print("HERE")
         return handle_record_to_dict(value)
     elif isinstance(value, Choice):
         return value.get_value()
@@ -49,7 +50,6 @@ def handle_value(value):
     return str(value)
 
 def handle_record_to_dict(record):
-    print("RECORD")
     result_dict = {}
     for key,value in record.get_key_values().items():
         result_dict[key] = handle_value(value)
@@ -79,7 +79,7 @@ zoho_field_mappings = {
     'multiselectlookup': list,  # Multiselect lookups could be stored as lists
     'multiselectpicklist': list[Choice],
     'textarea': str,      # Text areas can also be strings
-    'fileupload': dict,   # File uploads could be dictionaries (metadata about files)
+    'fileupload': list[ZCRMFileDetails],   # File uploads could be dictionaries (metadata about files)
     'subform': list,      # Subforms can be lists of dictionaries
     'formula': float,     # Formula fields may result in numbers
     'id': str,            # ID fields can be strings
@@ -103,6 +103,17 @@ def convert_to_sdk_type(field_api_name,value,fields):
         return float(value)
     elif crm_field_type == list[Choice]:
         return [Choice(x) for x in value]
+    elif crm_field_type == list[ZCRMFileDetails]:
+        file_details = []
+        for f in value:
+            file_detail = ZCRMFileDetails()
+            if(not f[1]):
+                file_detail.set_file_id(f[0])
+            else:
+                file_detail.set_attachment_id(f[0])
+                file_detail.set_delete(None)
+            file_details.append(file_detail)
+        return file_details
     elif crm_field_type == ZCRMRecord:  # Handle lookup fields
         record_instance = ZCRMRecord()  # Create an instance of the Record class
         record_instance.set_id(value['id'])  # Assuming the lookup field contains an 'id' key

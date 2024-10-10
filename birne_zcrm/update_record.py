@@ -13,10 +13,9 @@ def update_record_wrapper(module_api_name, record_id, record_data, trigger=None)
     """
     #convert dict to ZCRM object
     record_data = handle_dict_to_record(module_api_name=module_api_name,record_data=record_data)
-
+    record_data.set_id(record_id)
     # Create an instance of the BirneZohoCRM class
     crm_instance = BirneRecordOperations(module_api_name=module_api_name, trigger=trigger)
-    
     # Call the perform_operation method with 'UPDATE_RECORD' as the operation_name
     result = crm_instance.perform_operation("UPDATE_RECORD", record_id=record_id, record_data=record_data)
     

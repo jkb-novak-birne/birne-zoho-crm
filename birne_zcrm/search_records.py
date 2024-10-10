@@ -13,6 +13,6 @@ def search_records_wrapper(module_api_name, search_criteria, page=1):
     crm_instance = BirneRecordOperations(module_api_name=module_api_name)
     
     # Call the perform_operation method with 'SEARCH_RECORD' as the operation_name
-    records = crm_instance.perform_operation("SEARCH_RECORD", record_id=None, search_params=search_criteria)
+    records = crm_instance.perform_operation("SEARCH_RECORD", search_params=search_criteria)
     
     return records
